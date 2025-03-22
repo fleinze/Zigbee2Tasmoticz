@@ -72,8 +72,15 @@ class Handler:
                 Domoticz.Log("Send Command {} to {}".format(Command,Devices[Unit].Name))
                 Debug("Publish topic {} payload {}".format(topic,payload))
                 self.mqttClient.publish(topic, payload)
-            else:
-                Debut("Command {} not supported".format(Command))
+            elif Command == "Set Level":
+                payload="{ \"device\":"+Devices[Unit].DeviceID+", \"send\":{\"Dimmer\":"+str(int(Level*2.55))+"} }"
+                topic = self.prefix[1]+"/ZbSend"
+                Domoticz.Log("Send Command {} {} to {}".format(Command, str(int(Level*2.55)),Devices[Unit].Name))
+                Debug("Publish topic {} payload {}".format(topic,payload))
+                self.mqttClient.publish(topic, payload)
+                if Level>0:
+                    payload="{ \"device\":"+Devices[Unit].DeviceID+", \"send\":{\"Power\":1} }"
+                    self.mqttClient.publish(topic, payload)
         return True
 
     # Subscribe to our topics
@@ -101,8 +108,8 @@ class Handler:
                     updateLinkQuality(key, message['ZbReceived'][key]['LinkQuality'])
                 if 'Power' in message['ZbReceived'][key]:
                     updateSwitch(key, message['ZbReceived'][key]['Power'], message['ZbReceived'][key]['Name'])
-#                if 'Dimmer' in message['ZbReceived'][key]:
-#                    updateDimmer(key, message['ZbReceived'][key]['Dimmer'], message['ZbReceived'][key]['Name'])
+                if 'Dimmer' in message['ZbReceived'][key]:
+                    updateDimmer(key, message['ZbReceived'][key]['Dimmer'], message['ZbReceived'][key]['Name'])
 
 ###########################
 # Tasmota Utility functions
