@@ -95,14 +95,16 @@ class Handler:
                     updateHumidity(key, message['ZbReceived'][key]['Humidity'], message['ZbReceived'][key]['Name'])
                 if 'BatteryPercentage' in message['ZbReceived'][key]:
                     updateBatteryPercentage(key, message['ZbReceived'][key]['BatteryPercentage'])
-#                if 'BatteryVoltage' in message['ZbReceived'][key]:
-#                    updateBatteryVoltage(key, message['ZbReceived'][key]['BatteryVoltage'])
+                if 'BatteryVoltage' in message['ZbReceived'][key]:
+                    updateBatteryVoltage(key, message['ZbReceived'][key]['BatteryVoltage'])
                 if 'LinkQuality' in message['ZbReceived'][key]:
                     updateLinkQuality(key, message['ZbReceived'][key]['LinkQuality'])
                 if 'Power' in message['ZbReceived'][key]:
                     updateSwitch(key, message['ZbReceived'][key]['Power'], message['ZbReceived'][key]['Name'])
 #                if 'Dimmer' in message['ZbReceived'][key]:
 #                    updateDimmer(key, message['ZbReceived'][key]['Dimmer'], message['ZbReceived'][key]['Name'])
+                else:
+                    Debug("Unsupported Zigbee message: ".format(message['ZbReceived'][key]))
 
 ###########################
 # Tasmota Utility functions
@@ -167,8 +169,8 @@ def updateBatteryPercentage(shortname, battery_percentage):
            Devices[Device].Update(nValue=Devices[Device].nValue, sValue=Devices[Device].sValue, BatteryLevel=int(battery_percentage))
            Debug("Update Device {} Battery Percentage: {}".format(Devices[Device].Name, battery_percentage))
 
-#def updateBatteryVoltage(shortname, battery_voltage):
-#    Debug("Device: {}, Battery Voltage: {}".format(shortname, battery_voltage))
+def updateBatteryVoltage(shortname, battery_voltage): #do nothing
+    Debug("Device: {}, Battery Voltage: {}".format(shortname, battery_voltage))
 
 def updateLinkQuality(shortname, link_quality):
     for Device in Devices:
