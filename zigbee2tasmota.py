@@ -72,7 +72,7 @@ class Handler:
                 Domoticz.Log("Send Command {} to {}".format(Command,Devices[Unit].Name))
                 Debug("Publish topic {} payload {}".format(topic,payload))
                 self.mqttClient.publish(topic, payload)
-            else
+            else:
                 Debut("Command {} not supported".format(Command))
         return True
 
@@ -183,7 +183,7 @@ def updateSwitch(shortname, power, name):
     create=True
     for Device in Devices:
         if Devices[Device].DeviceID == shortname:
-           Debug("TypeID {}".format(Devices[Device].Type))
+#           Debug("TypeID {}".format(Devices[Device].Type))
            if Devices[Device].Type == 244:
                if Devices[Device].SwitchType ==7:
                    Devices[Device].Update(nValue=power,sValue= Devices[Device].sValue)
