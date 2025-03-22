@@ -103,8 +103,6 @@ class Handler:
                     updateSwitch(key, message['ZbReceived'][key]['Power'], message['ZbReceived'][key]['Name'])
 #                if 'Dimmer' in message['ZbReceived'][key]:
 #                    updateDimmer(key, message['ZbReceived'][key]['Dimmer'], message['ZbReceived'][key]['Name'])
-                else:
-                    Debug("Unsupported Zigbee message: ".format(message['ZbReceived'][key]))
 
 ###########################
 # Tasmota Utility functions
