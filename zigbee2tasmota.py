@@ -78,7 +78,7 @@ class Handler:
                 Domoticz.Log("Send Command {} {} to {}".format(Command, str(int(Level*2.55)),Devices[Unit].Name))
                 Debug("Publish topic {} payload {}".format(topic,payload))
                 self.mqttClient.publish(topic, payload)
-                if Level>0:
+                if Level > 0 and Devices[Unit].nValue == 0: #we need to switch it on if it was off
                     payload="{ \"device\":"+Devices[Unit].DeviceID+", \"send\":{\"Power\":1} }"
                     self.mqttClient.publish(topic, payload)
         return True
