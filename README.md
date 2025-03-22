@@ -13,6 +13,7 @@ Zigbee2Tasmoticz is a Domoticz plugin designed to integrate Zigbee devices manag
 Before installing the plugin, ensure you have:
 
 - [Domoticz](https://www.domoticz.com/) installed on your system.
+- A mqtt-broker like [Mosquitto](https://github.com/eclipse-mosquitto/mosquitto)
 - A Zigbee coordinator device running [Zigbee2Tasmota](https://tasmota.github.io/docs/Zigbee/).
 - [Python 3](https://www.python.org/downloads/) installed on your system.
 
