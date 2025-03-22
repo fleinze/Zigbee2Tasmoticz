@@ -21,7 +21,7 @@ except Exception as e:
 tasmotaDebug = True
 
 
-# Decide if zigbee2tasmota.py debug messages should be displayed if domoticz debug is enabled for this plugin
+# Decide if tasmota.py debug messages should be displayed if domoticz debug is enabled for this plugin
 def setTasmotaDebug(flag):
     global tasmotaDebug
     tasmotaDebug = flag
@@ -48,6 +48,7 @@ class Handler:
                        'STATUS5', 'STATUS8', 'STATUS11', 'ENERGY']
 
         self.prefix = [None, prefix1, prefix2]
+#        self.subscriptions = subscriptions
         self.mqttClient = mqttClient
 
         # I don't understand variable (in)visibility
@@ -63,12 +64,16 @@ class Handler:
         Debug("Handler::onDomoticzCommand: Unit: {}, Command: {}, Level: {}, Color: {}".format(
             Unit, Command, Level, Color))
         if Devices[Unit].Type == 244:
-            cmdnum= "1" if Command == "On" else "0"
-            payload="{ \"device\":"+Devices[Unit].DeviceID+", \"send\":{\"Power\":"+cmdnum+"} }"
-            topic = self.prefix[1]+"/ZbSend"
-            Domoticz.Log("Send Command {} to {}".format(Command,Devices[Unit].Name))
-            Debug("Publish topic {} payload {}".format(topic,payload))
-            self.mqttClient.publish(topic, payload)
+            Debug("Switchtype {}".format(Devices[Unit].SwitchType))
+            if Command == "On" or Command == "Off": #Devices[Unit].SwitchType == 0:
+                cmdnum= "1" if Command == "On" else "0"
+                payload="{ \"device\":"+Devices[Unit].DeviceID+", \"send\":{\"Power\":"+cmdnum+"} }"
+                topic = self.prefix[1]+"/ZbSend"
+                Domoticz.Log("Send Command {} to {}".format(Command,Devices[Unit].Name))
+                Debug("Publish topic {} payload {}".format(topic,payload))
+                self.mqttClient.publish(topic, payload)
+            else
+                Debut("Command {} not supported".format(Command))
         return True
 
     # Subscribe to our topics
@@ -96,7 +101,8 @@ class Handler:
                     updateLinkQuality(key, message['ZbReceived'][key]['LinkQuality'])
                 if 'Power' in message['ZbReceived'][key]:
                     updateSwitch(key, message['ZbReceived'][key]['Power'], message['ZbReceived'][key]['Name'])
-
+#                if 'Dimmer' in message['ZbReceived'][key]:
+#                    updateDimmer(key, message['ZbReceived'][key]['Dimmer'], message['ZbReceived'][key]['Name'])
 
 ###########################
 # Tasmota Utility functions
@@ -135,9 +141,11 @@ def updateHumidity(shortname, humidity,name):
     for Device in Devices:
         if Devices[Device].DeviceID == shortname:
            if Devices[Device].Type == 81: #Humidity
+#              Debug("Device {}".format(Devices[Device].Type))
               Devices[Device].Update(nValue=int(humidity), sValue=humstat)
               Domoticz.Log("Update Device {} Humidity {}".format(Devices[Device].Name,humidity))
            elif Devices[Device].Type == 80: #Temperature
+#              Devices[Device].Update(TypeName="Temp+Hum")
               Devices[Device].Update(TypeName="Temp+Hum",nValue=0, sValue="{};{};{}".format(Devices[Device].sValue,humidity,humstat))
               Domoticz.Log("Update Device {} to Temp+Hum Humidity {}".format(Devices[Device].Name,humidity))
            elif Devices[Device].Type == 82: #Temp+Hum
@@ -148,9 +156,10 @@ def updateHumidity(shortname, humidity,name):
               svalue=";".join(parts)
               Devices[Device].Update(TypeName="Temp+Hum",nValue=0, sValue=svalue)
               Domoticz.Log("Update Device {} Humidity {}".format(Devices[Device].Name,humidity))
+#              Debug("type temp+hum update. svalue = {}".format(svalue))
            create=False
     if create or len(Devices)==0:
-        createDevice(shortname,devicetype="Humidity",name=name,nvalue=humidity,svalue="0")
+        createDevice(shortname,devicetype="Humidity",name=name,nvalue=humidity,svalue=humstat)
 
 def updateBatteryPercentage(shortname, battery_percentage):
     for Device in Devices:
@@ -164,7 +173,7 @@ def updateBatteryPercentage(shortname, battery_percentage):
 def updateLinkQuality(shortname, link_quality):
     for Device in Devices:
         if Devices[Device].DeviceID == shortname:
-           Devices[Device].Update(nValue=Devices[Device].nValue, sValue=Devices[Device].sValue, SignalLevel=int(link_quality*.12))
+           Devices[Device].Update(nValue=Devices[Device].nValue, sValue=Devices[Device].sValue, SignalLevel=int(min(link_quality*.1,12)))
            Debug("Device: {}, Link Quality: {}".format(Devices[Device].Name, link_quality))
 
 def updateSwitch(shortname, power, name):
@@ -172,12 +181,29 @@ def updateSwitch(shortname, power, name):
     create=True
     for Device in Devices:
         if Devices[Device].DeviceID == shortname:
+           Debug("TypeID {}".format(Devices[Device].Type))
            if Devices[Device].Type == 244:
-               Devices[Device].Update(nValue=power,sValue="On" if power == 1 else "Off")
+               if Devices[Device].SwitchType ==7:
+                   Devices[Device].Update(nValue=power,sValue= Devices[Device].sValue)
+               else:
+                   Devices[Device].Update(nValue=power,sValue="On" if power == 1 else "Off")
                Domoticz.Log("Update switch {} nvalue {} svalue {}".format(name,power,"On" if power == 1 else "Off"))
            create=False
     if create or len(Devices)==0:
         createDevice(shortname,devicetype="Switch",name=name,nvalue=power,svalue="")
+
+def updateDimmer(shortname, dimmer, name):
+    Debug("Device: {}, Dimmer: {}".format(shortname, dimmer))
+    for Device in Devices:
+        if Devices[Device].DeviceID == shortname:
+           Debug("SwitchType {}".format(Devices[Device].SwitchType))
+           if Devices[Device].Type == 244:
+               if Devices[Device].SwitchType !=7:
+                   Devices[Device].Update(Subtype=73,Switchtype=7,sValue=str(int(dimmer/2.55)),nValue=Devices[Device].nValue)
+               Devices[Device].Update(sValue=str(int(dimmer/2.55)),nValue=Devices[Device].nValue)
+#               Devices[Device].Update(nValue=power,sValue="On" if power == 1 else "Off")
+               Domoticz.Log("Update dimmer {}  {}".format(name,dimmer))
+
 
 def createDevice(shortname, devicetype,name,nvalue,svalue):
     Domoticz.Log("Create Device: {} {}".format(name, devicetype))
@@ -192,3 +218,8 @@ def findfreeUnit():
         if idx not in Devices:
             break
     return idx
+
+#def sendZb(shortname, command):
+
+####todo: send commands to devices
+
