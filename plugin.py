@@ -19,8 +19,8 @@
         <param field="Mode5"    label="Client" width="300px" default=""/>
         <param field="Password" label="Password" width="300px" default="" password="true"/>
         
-        <param field="Mode1" label="Prefix1 (cmnd)" width="300px" default="cmnd/tasmota_xxxxxx"/>
-        <param field="Mode2" label="Prefix2 (tele)" width="300px" default="tele/tasmota_xxxxxx/SENSOR"/>
+        <param field="Mode1" label="Command-Topic" width="300px" default="cmnd/tasmota_xxxxxx"/>
+        <param field="Mode2" label="Tele-Topic" width="300px" default="tele/tasmota_xxxxxx/SENSOR"/>
 
         <param field="Mode6" label="Logging" width="75px">
             <options>
