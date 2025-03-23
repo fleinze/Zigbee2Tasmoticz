@@ -134,7 +134,7 @@ def updateTemp(shortaddr,temperature,friendlyname):
               Domoticz.Log("Update Device {} Temperature {}".format(Devices[Device].Name,temperature))
            create=False
     if create or len(Devices)==0:
-        createDevice(shortaddr,devicetype="Temperature",name=friendlyname,nvalue=0,svalue="{}".format(temperature))
+        createDevice(deviceid=shortaddr,devicetype="Temperature",name=friendlyname,nvalue=0,svalue="{}".format(temperature))
 
 
 def updateHumidity(shortaddr, humidity,friendlyname):
@@ -166,7 +166,7 @@ def updateHumidity(shortaddr, humidity,friendlyname):
 #              Debug("type temp+hum update. svalue = {}".format(svalue))
            create=False
     if create or len(Devices)==0:
-        createDevice(shortaddr,devicetype="Humidity",name=friendlyname,nvalue=humidity,svalue=humstat)
+        createDevice(deviceid=shortaddr,devicetype="Humidity",name=friendlyname,nvalue=int(humidity),svalue=humstat)
 
 def updateBatteryPercentage(shortaddr, battery_percentage):
     for Device in Devices:
@@ -197,7 +197,7 @@ def updateSwitch(shortaddr, power, friendlyname):
                Domoticz.Log("Update switch {} nvalue {} svalue {}".format(friendlyname,power,"On" if power == 1 else "Off"))
            create=False
     if create or len(Devices)==0:
-        createDevice(shortaddr,devicetype="Switch",name=friendlyname,nvalue=power,svalue="")
+        createDevice(deviceid=shortaddr,devicetype="Switch",name=friendlyname,nvalue=power,svalue="")
 
 def updateDimmer(shortaddr, dimmer, friendlyname): #dimmers are not created but only updated from existing switches
     Debug("Device: {}, Dimmer: {}".format(shortaddr, dimmer))
@@ -212,12 +212,12 @@ def updateDimmer(shortaddr, dimmer, friendlyname): #dimmers are not created but 
                Domoticz.Log("Update dimmer {}  {}".format(friendlyname,dimmer))
 
 
-def createDevice(shortaddr, devicetype, friendlyname, nvalue, svalue):
-    Domoticz.Log("Create Device: {} {}".format(friendlyname, devicetype))
+def createDevice(deviceid, devicetype, name, nvalue, svalue):
+    Domoticz.Log("Create Device: {} {}".format(name, devicetype))
     unit = findfreeUnit()
-    Domoticz.Device(Name=friendlyname, Unit=unit, TypeName=devicetype, Used=1, DeviceID=shortaddr).Create()
+    Domoticz.Device(Name=name, Unit=unit, TypeName=devicetype, Used=1, DeviceID=deviceid).Create()
     for Device in Devices:
-        if Devices[Device].DeviceID == shortaddr:
+        if Devices[Device].DeviceID == deviceid:
            Devices[Device].Update(nValue=nvalue, sValue=svalue)
 
 def findfreeUnit():
@@ -225,8 +225,3 @@ def findfreeUnit():
         if idx not in Devices:
             break
     return idx
-
-#def sendZb(shortaddr, command):
-
-####todo: send commands to devices
-
