@@ -8,6 +8,14 @@ Zigbee2Tasmoticz is a Domoticz plugin designed to integrate Zigbee devices manag
 - **Real-time Monitoring**: Receive immediate updates from Zigbee devices within the Domoticz interface.
 - **Device Compatibility**: Supports a wide range of Zigbee devices compatible with Zigbee2Tasmota.
 
+## Supported Devices
+
+- Temperatur Sensors
+- Humidity Sensors
+- Switches
+- Switching Actuators like Lamps or Relais
+- Dimmers
+
 ## Prerequisites
 
 Before installing the plugin, ensure you have:

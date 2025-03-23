@@ -123,7 +123,7 @@ def updateTemp(shortaddr,temperature,friendlyname):
               Devices[Device].Update(nValue=0, sValue="{}".format(temperature))
               Domoticz.Log("Update Device {} Temperature {}".format(Devices[Device].Name,temperature))
            elif Devices[Device].Type == 81: #Humidity
-              Devices[Device].Update(TypeName="Temp+Hum",nValue=0, sValue="{};{};1".format(temperature,Devices[Device].nValue))
+              Devices[Device].Update(TypeName="Temp+Hum",nValue=0, sValue="{};{};{}".format(temperature,Devices[Device].nValue,Devices[Device].sValue))
               Domoticz.Log("Update Device {} to Temp+Hum Temperature {}".format(Devices[Device].Name,temperature))
            elif Devices[Device].Type == 82: #Temp+Hum
               svalue=Devices[Device].sValue
@@ -152,7 +152,6 @@ def updateHumidity(shortaddr, humidity,friendlyname):
               Devices[Device].Update(nValue=int(humidity), sValue=humstat)
               Domoticz.Log("Update Device {} Humidity {}".format(Devices[Device].Name,humidity))
            elif Devices[Device].Type == 80: #Temperature
-#              Devices[Device].Update(TypeName="Temp+Hum")
               Devices[Device].Update(TypeName="Temp+Hum",nValue=0, sValue="{};{};{}".format(Devices[Device].sValue,humidity,humstat))
               Domoticz.Log("Update Device {} to Temp+Hum Humidity {}".format(Devices[Device].Name,humidity))
            elif Devices[Device].Type == 82: #Temp+Hum
@@ -180,7 +179,7 @@ def updateBatteryVoltage(shortaddr, battery_voltage): #do nothing
 def updateLinkQuality(shortaddr, link_quality):
     for Device in Devices:
         if Devices[Device].DeviceID == shortaddr:
-           Devices[Device].Update(nValue=Devices[Device].nValue, sValue=Devices[Device].sValue, SignalLevel=int(min(link_quality*.1,12)))
+           Devices[Device].Update(nValue=Devices[Device].nValue, sValue=Devices[Device].sValue, SignalLevel=int(min(link_quality/254*12,12)))
            Debug("Device: {}, Link Quality: {}".format(Devices[Device].Name, link_quality))
 
 def updateSwitch(shortaddr, power, friendlyname):
