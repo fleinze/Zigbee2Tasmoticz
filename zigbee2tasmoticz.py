@@ -115,10 +115,10 @@ class Handler:
 # Tasmota Utility functions
 
 
-def updateTemp(shortname,temperature,name):
+def updateTemp(shortaddr,temperature,friendlyname):
     create=True
     for Device in Devices:
-        if Devices[Device].DeviceID == shortname:
+        if Devices[Device].DeviceID == shortaddr:
            if Devices[Device].Type == 80: #Temperature
               Devices[Device].Update(nValue=0, sValue="{}".format(temperature))
               Domoticz.Log("Update Device {} Temperature {}".format(Devices[Device].Name,temperature))
@@ -134,10 +134,10 @@ def updateTemp(shortname,temperature,name):
               Domoticz.Log("Update Device {} Temperature {}".format(Devices[Device].Name,temperature))
            create=False
     if create or len(Devices)==0:
-        createDevice(shortname,devicetype="Temperature",name=name,nvalue=0,svalue="{}".format(temperature))
+        createDevice(deviceid=shortaddr,devicetype="Temperature",name=friendlyname,nvalue=0,svalue="{}".format(temperature))
 
 
-def updateHumidity(shortname, humidity,name):
+def updateHumidity(shortaddr, humidity,friendlyname):
     create=True
     if humidity<40:
         humstat="2"
@@ -146,7 +146,7 @@ def updateHumidity(shortname, humidity,name):
     else:
         humstat="1"
     for Device in Devices:
-        if Devices[Device].DeviceID == shortname:
+        if Devices[Device].DeviceID == shortaddr:
            if Devices[Device].Type == 81: #Humidity
 #              Debug("Device {}".format(Devices[Device].Type))
               Devices[Device].Update(nValue=int(humidity), sValue=humstat)
@@ -166,58 +166,58 @@ def updateHumidity(shortname, humidity,name):
 #              Debug("type temp+hum update. svalue = {}".format(svalue))
            create=False
     if create or len(Devices)==0:
-        createDevice(shortname,devicetype="Humidity",name=name,nvalue=humidity,svalue=humstat)
+        createDevice(deviceid=shortaddr,devicetype="Humidity",name=friendlyname,nvalue=int(humidity),svalue=humstat)
 
-def updateBatteryPercentage(shortname, battery_percentage):
+def updateBatteryPercentage(shortaddr, battery_percentage):
     for Device in Devices:
-        if Devices[Device].DeviceID == shortname:
+        if Devices[Device].DeviceID == shortaddr:
            Devices[Device].Update(nValue=Devices[Device].nValue, sValue=Devices[Device].sValue, BatteryLevel=int(battery_percentage))
            Debug("Update Device {} Battery Percentage: {}".format(Devices[Device].Name, battery_percentage))
 
-def updateBatteryVoltage(shortname, battery_voltage): #do nothing
-    Debug("Device: {}, Battery Voltage: {}".format(shortname, battery_voltage))
+def updateBatteryVoltage(shortaddr, battery_voltage): #do nothing
+    Debug("Device: {}, Battery Voltage: {}".format(shortaddr, battery_voltage))
 
-def updateLinkQuality(shortname, link_quality):
+def updateLinkQuality(shortaddr, link_quality):
     for Device in Devices:
-        if Devices[Device].DeviceID == shortname:
+        if Devices[Device].DeviceID == shortaddr:
            Devices[Device].Update(nValue=Devices[Device].nValue, sValue=Devices[Device].sValue, SignalLevel=int(min(link_quality*.1,12)))
            Debug("Device: {}, Link Quality: {}".format(Devices[Device].Name, link_quality))
 
-def updateSwitch(shortname, power, name):
-    Debug("Device: {}, Power: {}".format(shortname, power))
+def updateSwitch(shortaddr, power, friendlyname):
+    Debug("Device: {}, Power: {}".format(shortaddr, power))
     create=True
     for Device in Devices:
-        if Devices[Device].DeviceID == shortname:
+        if Devices[Device].DeviceID == shortaddr:
 #           Debug("TypeID {}".format(Devices[Device].Type))
            if Devices[Device].Type == 244:
                if Devices[Device].SwitchType ==7:
                    Devices[Device].Update(nValue=power,sValue= Devices[Device].sValue)
                else:
                    Devices[Device].Update(nValue=power,sValue="On" if power == 1 else "Off")
-               Domoticz.Log("Update switch {} nvalue {} svalue {}".format(name,power,"On" if power == 1 else "Off"))
+               Domoticz.Log("Update switch {} nvalue {} svalue {}".format(friendlyname,power,"On" if power == 1 else "Off"))
            create=False
     if create or len(Devices)==0:
-        createDevice(shortname,devicetype="Switch",name=name,nvalue=power,svalue="")
+        createDevice(deviceid=shortaddr,devicetype="Switch",name=friendlyname,nvalue=power,svalue="")
 
-def updateDimmer(shortname, dimmer, name):
-    Debug("Device: {}, Dimmer: {}".format(shortname, dimmer))
+def updateDimmer(shortaddr, dimmer, friendlyname): #dimmers are not created but only updated from existing switches
+    Debug("Device: {}, Dimmer: {}".format(shortaddr, dimmer))
     for Device in Devices:
-        if Devices[Device].DeviceID == shortname:
+        if Devices[Device].DeviceID == shortaddr:
            Debug("SwitchType {}".format(Devices[Device].SwitchType))
            if Devices[Device].Type == 244:
                if Devices[Device].SwitchType !=7:
                    Devices[Device].Update(Subtype=73,Switchtype=7,sValue=str(int(dimmer/2.55)),nValue=Devices[Device].nValue)
                Devices[Device].Update(sValue=str(int(dimmer/2.55)),nValue=Devices[Device].nValue)
 #               Devices[Device].Update(nValue=power,sValue="On" if power == 1 else "Off")
-               Domoticz.Log("Update dimmer {}  {}".format(name,dimmer))
+               Domoticz.Log("Update dimmer {}  {}".format(friendlyname,dimmer))
 
 
-def createDevice(shortname, devicetype,name,nvalue,svalue):
+def createDevice(deviceid, devicetype, name, nvalue, svalue):
     Domoticz.Log("Create Device: {} {}".format(name, devicetype))
     unit = findfreeUnit()
-    Domoticz.Device(Name=name, Unit=unit, TypeName=devicetype, Used=1, DeviceID=shortname).Create()
+    Domoticz.Device(Name=name, Unit=unit, TypeName=devicetype, Used=1, DeviceID=deviceid).Create()
     for Device in Devices:
-        if Devices[Device].DeviceID == shortname:
+        if Devices[Device].DeviceID == deviceid:
            Devices[Device].Update(nValue=nvalue, sValue=svalue)
 
 def findfreeUnit():
@@ -225,8 +225,3 @@ def findfreeUnit():
         if idx not in Devices:
             break
     return idx
-
-#def sendZb(shortname, command):
-
-####todo: send commands to devices
-

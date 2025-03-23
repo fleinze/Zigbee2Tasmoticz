@@ -44,7 +44,7 @@ try:
 except Exception as e:
     errmsg += " mqtt::MqttClient import error: "+str(e)
 try:
-    from zigbee2tasmota import Handler, setTasmotaDebug
+    from zigbee2tasmoticz import Handler, setTasmotaDebug
 except Exception as e:
     errmsg += " tasmota::Handler import error: "+str(e)
 
