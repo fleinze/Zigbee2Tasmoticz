@@ -44,8 +44,8 @@ class Handler:
                 "Handler::__init__: Domoticz Python env error {}".format(errmsg))
 
         # So far only STATUS, STATE, SENSOR and RESULT are used. Others just for research...
-        self.topics = ['INFO1', 'STATE', 'SENSOR', 'RESULT', 'STATUS',
-                       'STATUS5', 'STATUS8', 'STATUS11', 'ENERGY']
+#        self.topics = ['INFO1', 'STATE', 'SENSOR', 'RESULT', 'STATUS',
+#                       'STATUS5', 'STATUS8', 'STATUS11', 'ENERGY']
 
         self.prefix = [None, prefix1, prefix2]
 #        self.subscriptions = subscriptions
