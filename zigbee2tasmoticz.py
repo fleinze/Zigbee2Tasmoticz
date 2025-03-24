@@ -8,10 +8,10 @@ try:
     import Domoticz
 except Exception as e:
     errmsg += "Domoticz core start error: "+str(e)
-try:
-    import json
-except Exception as e:
-    errmsg += " Json import error: "+str(e)
+#try:
+#    import json
+#except Exception as e:
+#    errmsg += " Json import error: "+str(e)
 #try:
 #    import binascii
 #except Exception as e:
