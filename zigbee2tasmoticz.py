@@ -12,10 +12,10 @@ try:
     import json
 except Exception as e:
     errmsg += " Json import error: "+str(e)
-try:
-    import binascii
-except Exception as e:
-    errmsg += " binascii import error: "+str(e)
+#try:
+#    import binascii
+#except Exception as e:
+#    errmsg += " binascii import error: "+str(e)
 
 
 tasmotaDebug = True
