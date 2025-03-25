@@ -66,14 +66,14 @@ class Handler:
         if Devices[Unit].Type == 244:
             Debug("Switchtype {}".format(Devices[Unit].SwitchType))
             if Command == "On" or Command == "Off": #Devices[Unit].SwitchType == 0:
-                cmdnum= "1" if Command == "On" else "0"
-                payload="{ \"device\":"+Devices[Unit].DeviceID+", \"send\":{\"Power\":"+cmdnum+"} }"
+#                cmdnum= "1" if Command == "On" else "0"
+                payload="{ \"Device\":"+Devices[Unit].DeviceID+", \"Send\":{\"Power\":\""+Command+"\"} }"
                 topic = self.prefix[1]+"/ZbSend"
                 Domoticz.Log("Send Command {} to {}".format(Command,Devices[Unit].Name))
                 Debug("Publish topic {} payload {}".format(topic,payload))
                 self.mqttClient.publish(topic, payload)
             elif Command == "Set Level":
-                payload="{ \"device\":"+Devices[Unit].DeviceID+", \"send\":{\"Dimmer\":"+str(int(Level*2.55))+"} }"
+                payload="{ \"Device\":"+Devices[Unit].DeviceID+", \"Send\":{\"Dimmer\":"+str(int(Level*2.55))+"} }"
                 topic = self.prefix[1]+"/ZbSend"
                 Domoticz.Log("Send Command {} {} to {}".format(Command, str(int(Level*2.55)),Devices[Unit].Name))
                 Debug("Publish topic {} payload {}".format(topic,payload))
