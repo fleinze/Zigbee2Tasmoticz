@@ -134,7 +134,7 @@ def updateTemp(shortaddr,temperature,friendlyname):
               Domoticz.Log("Update Device {} Temperature {}".format(Devices[idx].Name,temperature))
            create=False
     if create:
-        createDevice(deviceid=shortaddr,devicetype="Temperature",name=friendlyname,nvalue=0,svalue="{}".format(temperature))
+        createDevice(deviceid=shortaddr,devicetype="Temperature",name=friendlyname,nvalue=0,svalue="{:.1f}".format(temperature))
 
 
 def updateHumidity(shortaddr, humidity,friendlyname):
@@ -163,7 +163,7 @@ def updateHumidity(shortaddr, humidity,friendlyname):
               Domoticz.Log("Update Device {} Humidity {}".format(Devices[idx].Name,humidity))
            create=False
     if create:
-        createDevice(deviceid=shortaddr,devicetype="Humidity",name=friendlyname,nvalue=int(humidity),svalue=humstat)
+        createDevice(deviceid=shortaddr,devicetype="Humidity",name=friendlyname,nvalue=int(round(humidity)),svalue=humstat)
 
 def updateBatteryPercentage(shortaddr, battery_percentage):
     for idx in Devices:
@@ -212,9 +212,12 @@ def createDevice(deviceid, devicetype, name, nvalue, svalue):
     Domoticz.Log("Create Device: {} {}".format(name, devicetype))
     unit = findfreeUnit()
     Domoticz.Device(Name=name, Unit=unit, TypeName=devicetype, Used=1, DeviceID=deviceid).Create()
-    for idx in Devices:
-        if Devices[idx].DeviceID == deviceid:
-           Devices[idx].Update(nValue=nvalue, sValue=svalue)
+    if unit in Devices:
+#        Devices[unit].Update(nValue=Devices[unit].nValue, sValue=Devices[unit].sValue, Name=name, SuppressTriggers=True)
+        Devices[unit].Update(nValue=nvalue, sValue=svalue)
+#    for idx in Devices:
+#        if Devices[idx].DeviceID == deviceid:
+#           Devices[idx].Update(nValue=nvalue, sValue=svalue)
 
 def findfreeUnit():
     for idx in range(1, 512):
