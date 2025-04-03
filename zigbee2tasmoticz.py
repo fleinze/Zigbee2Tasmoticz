@@ -96,10 +96,14 @@ class Handler:
         if 'ZbReceived' in message:
             keys=list(message['ZbReceived'].keys())
             for key in keys:
+                if 'Name' in message['ZbReceived'][key]:
+                    friendlyname = message['ZbReceived'][key]['Name']
+                else
+                    friendlyname = message['ZbReceived'][key]['Device']
                 if 'Temperature' in message['ZbReceived'][key]:
-                    updateTemp(message['ZbReceived'][key]['Device'],message['ZbReceived'][key]['Temperature'], message['ZbReceived'][key]['Name'])
+                    updateTemp(message['ZbReceived'][key]['Device'],message['ZbReceived'][key]['Temperature'], friendlyname)
                 if 'Humidity' in message['ZbReceived'][key]:
-                    updateHumidity(message['ZbReceived'][key]['Device'], message['ZbReceived'][key]['Humidity'], message['ZbReceived'][key]['Name'])
+                    updateHumidity(message['ZbReceived'][key]['Device'], message['ZbReceived'][key]['Humidity'], friendlyname)
                 if 'BatteryPercentage' in message['ZbReceived'][key]:
                     updateBatteryPercentage(message['ZbReceived'][key]['Device'], message['ZbReceived'][key]['BatteryPercentage'])
                 if 'BatteryVoltage' in message['ZbReceived'][key]:
@@ -107,9 +111,9 @@ class Handler:
                 if 'LinkQuality' in message['ZbReceived'][key]:
                     updateLinkQuality(message['ZbReceived'][key]['Device'], message['ZbReceived'][key]['LinkQuality'])
                 if 'Power' in message['ZbReceived'][key]:
-                    updateSwitch(message['ZbReceived'][key]['Device'], message['ZbReceived'][key]['Power'], message['ZbReceived'][key]['Name'])
+                    updateSwitch(message['ZbReceived'][key]['Device'], message['ZbReceived'][key]['Power'], friendlyname)
                 if 'Dimmer' in message['ZbReceived'][key]:
-                    updateDimmer(message['ZbReceived'][key]['Device'], message['ZbReceived'][key]['Dimmer'], message['ZbReceived'][key]['Name'])
+                    updateDimmer(message['ZbReceived'][key]['Device'], message['ZbReceived'][key]['Dimmer'], friendlyname)
 
 ###########################
 # Tasmota Utility functions
