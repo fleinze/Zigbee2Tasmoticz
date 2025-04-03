@@ -98,7 +98,7 @@ class Handler:
             for key in keys:
                 if 'Name' in message['ZbReceived'][key]:
                     friendlyname = message['ZbReceived'][key]['Name']
-                else
+                else:
                     friendlyname = message['ZbReceived'][key]['Device']
                 if 'Temperature' in message['ZbReceived'][key]:
                     updateTemp(message['ZbReceived'][key]['Device'],message['ZbReceived'][key]['Temperature'], friendlyname)
