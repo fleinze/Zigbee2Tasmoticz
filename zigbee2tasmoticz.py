@@ -100,22 +100,30 @@ class Handler:
                     friendlyname = message['ZbReceived'][key]['Name']
                 else:
                     friendlyname = message['ZbReceived'][key]['Device']
+                if message['ZbReceived'][key]['Endpoint'] == 1:
+                    device = message['ZbReceived'][key]['Device']
+                else:
+                    device = message['ZbReceived'][key]['Device']+'-'+str(message['ZbReceived'][key]['Endpoint'])
+#                Debug(device)
                 if 'Temperature' in message['ZbReceived'][key]:
-                    updateTemp(message['ZbReceived'][key]['Device'],message['ZbReceived'][key]['Temperature'], friendlyname)
+                    updateTemp(device,message['ZbReceived'][key]['Temperature'], friendlyname)
                 if 'Humidity' in message['ZbReceived'][key]:
-                    updateHumidity(message['ZbReceived'][key]['Device'], message['ZbReceived'][key]['Humidity'], friendlyname)
+                    updateHumidity(device, message['ZbReceived'][key]['Humidity'], friendlyname)
                 if 'BatteryPercentage' in message['ZbReceived'][key]:
-                    updateBatteryPercentage(message['ZbReceived'][key]['Device'], message['ZbReceived'][key]['BatteryPercentage'])
+                    updateBatteryPercentage(device, message['ZbReceived'][key]['BatteryPercentage'])
                 if 'BatteryVoltage' in message['ZbReceived'][key]:
-                    updateBatteryVoltage(message['ZbReceived'][key]['Device'], message['ZbReceived'][key]['BatteryVoltage'])
+                    updateBatteryVoltage(device, message['ZbReceived'][key]['BatteryVoltage'])
                 if 'LinkQuality' in message['ZbReceived'][key]:
-                    updateLinkQuality(message['ZbReceived'][key]['Device'], message['ZbReceived'][key]['LinkQuality'])
+                    updateLinkQuality(device, message['ZbReceived'][key]['LinkQuality'])
                 if 'Power' in message['ZbReceived'][key]:
-                    updateSwitch(message['ZbReceived'][key]['Device'], message['ZbReceived'][key]['Power'], friendlyname)
+                    updateSwitch(device, message['ZbReceived'][key]['Power'], friendlyname)
                 if 'Dimmer' in message['ZbReceived'][key]:
-                    updateDimmer(message['ZbReceived'][key]['Device'], message['ZbReceived'][key]['Dimmer'], friendlyname)
+                    updateDimmer(device, message['ZbReceived'][key]['Dimmer'], friendlyname)
                 if 'Water' in message['ZbReceived'][key]:
-                    updateSwitch(message['ZbReceived'][key]['Device'], message['ZbReceived'][key]['Water'], friendlyname)
+                    updateSwitch(device, message['ZbReceived'][key]['Water'], friendlyname)
+                if 'Occupancy' in message['ZbReceived'][key]:
+                    updateSwitch(device, message['ZbReceived'][key]['Occupancy'], friendlyname)
+
 ###########################
 # Tasmota Utility functions
 
