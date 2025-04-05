@@ -114,7 +114,8 @@ class Handler:
                     updateSwitch(message['ZbReceived'][key]['Device'], message['ZbReceived'][key]['Power'], friendlyname)
                 if 'Dimmer' in message['ZbReceived'][key]:
                     updateDimmer(message['ZbReceived'][key]['Device'], message['ZbReceived'][key]['Dimmer'], friendlyname)
-
+                if 'Water' in message['ZbReceived'][key]:
+                    updateSwitch(message['ZbReceived'][key]['Device'], message['ZbReceived'][key]['Water'], friendlyname)
 ###########################
 # Tasmota Utility functions
 

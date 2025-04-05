@@ -15,6 +15,7 @@ Zigbee2Tasmoticz is a Domoticz plugin designed to integrate Zigbee devices manag
 - Switches
 - Switching Actuators like Lamps or Relais
 - Dimmers
+- Watersensor (Ikea Badring)
 
 ## Prerequisites
 
