@@ -123,6 +123,8 @@ class Handler:
                     updateSwitch(device, message['ZbReceived'][key]['Water'], friendlyname)
                 if 'Occupancy' in message['ZbReceived'][key]:
                     updateSwitch(device, message['ZbReceived'][key]['Occupancy'], friendlyname)
+                if 'Illuminance' in message['ZbReceived'][key]:
+                    updateLightsensor(device, message['ZbReceived'][key]['Illuminance'], friendlyname)
 
 ###########################
 # Tasmota Utility functions
@@ -177,6 +179,18 @@ def updateHumidity(shortaddr, humidity,friendlyname):
            create=False
     if create:
         createDevice(deviceid=shortaddr,devicetype="Humidity",name=friendlyname,nvalue=int(round(humidity)),svalue=humstat)
+
+def updateLightsensor(shortaddr, illuminance, friendlyname):
+    create = True
+    lux = 10**(illuminance/10000)-1 # according to zigbee documentation
+    for idx in Devices:
+        if Devices[idx].DeviceID == shortaddr:
+           if Devices[idx].Type == 246: # Lux
+              Devices[idx].Update(nValue=0,sValue=str(lux))
+              Domoticz.Log("Update Device {} Lux {}".format(Devices[idx].Name,lux))
+           create=False
+    if create:
+        createDevice(deviceid=shortaddr,devicetype="Illumination",name=friendlyname,nvalue=0,svalue=str(lux))
 
 def updateBatteryPercentage(shortaddr, battery_percentage):
     for idx in Devices:
