@@ -103,7 +103,7 @@ class Handler:
                 if 'Endpoint' in message['ZbReceived'][key] and message['ZbReceived'][key]['Endpoint'] > 1:
                     device = message['ZbReceived'][key]['Device']+'-'+str(message['ZbReceived'][key]['Endpoint'])
                 else:
-                     device = message['ZbReceived'][key]['Device']
+                    device = message['ZbReceived'][key]['Device']
                 if 'Temperature' in message['ZbReceived'][key]:
                     updateTemp(device,message['ZbReceived'][key]['Temperature'], friendlyname)
                 if 'Humidity' in message['ZbReceived'][key]:
@@ -181,7 +181,7 @@ def updateHumidity(shortaddr, humidity,friendlyname):
 
 def updateLightsensor(shortaddr, illuminance, friendlyname):
     create = True
-    lux = 10**(illuminance/10000)-1 # according to zigbee documentation
+    lux = round(10**(illuminance/10000)-1) # according to zigbee documentation
     for idx in Devices:
         if Devices[idx].DeviceID == shortaddr:
            if Devices[idx].Type == 246: # Lux
