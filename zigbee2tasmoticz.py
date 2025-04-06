@@ -100,10 +100,13 @@ class Handler:
                     friendlyname = message['ZbReceived'][key]['Name']
                 else:
                     friendlyname = message['ZbReceived'][key]['Device']
-                if message['ZbReceived'][key]['Endpoint'] == 1:
-                    device = message['ZbReceived'][key]['Device']
+                if 'Endpoint' in message['ZbReceived'][key]['Endpoint']:
+                    if message['ZbReceived'][key]['Endpoint'] == 1:
+                        device = message['ZbReceived'][key]['Device']
+                    else:
+                        device = message['ZbReceived'][key]['Device']+'-'+str(message['ZbReceived'][key]['Endpoint'])
                 else:
-                    device = message['ZbReceived'][key]['Device']+'-'+str(message['ZbReceived'][key]['Endpoint'])
+                     device = message['ZbReceived'][key]['Device']
 #                Debug(device)
                 if 'Temperature' in message['ZbReceived'][key]:
                     updateTemp(device,message['ZbReceived'][key]['Temperature'], friendlyname)
