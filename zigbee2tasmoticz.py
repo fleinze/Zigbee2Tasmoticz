@@ -12,10 +12,6 @@ except Exception as e:
 #    import json
 #except Exception as e:
 #    errmsg += " Json import error: "+str(e)
-#try:
-#    import binascii
-#except Exception as e:
-#    errmsg += " binascii import error: "+str(e)
 try:
     import time
     from datetime import datetime, timedelta
@@ -48,12 +44,7 @@ class Handler:
             Domoticz.Error(
                 "Handler::__init__: Domoticz Python env error {}".format(errmsg))
 
-        # So far only STATUS, STATE, SENSOR and RESULT are used. Others just for research...
-#        self.topics = ['INFO1', 'STATE', 'SENSOR', 'RESULT', 'STATUS',
-#                       'STATUS5', 'STATUS8', 'STATUS11', 'ENERGY']
-
         self.prefix = [None, prefix1, prefix2]
-#        self.subscriptions = subscriptions
         self.mqttClient = mqttClient
 
         # I don't understand variable (in)visibility
@@ -70,8 +61,7 @@ class Handler:
             Unit, Command, Level, Color))
         if Devices[Unit].Type == 244:
             Debug("Switchtype {}".format(Devices[Unit].SwitchType))
-            if Command == "On" or Command == "Off": #Devices[Unit].SwitchType == 0:
-#                cmdnum= "1" if Command == "On" else "0"
+            if Command == "On" or Command == "Off":
                 payload="{ \"Device\":"+Devices[Unit].DeviceID+", \"Send\":{\"Power\":\""+Command+"\"} }"
                 topic = self.prefix[1]+"/ZbSend"
                 Domoticz.Log("Send Command {} to {}".format(Command,Devices[Unit].Name))
@@ -131,13 +121,15 @@ class Handler:
                     updateLightsensor(device, message['ZbReceived'][key]['Illuminance'], friendlyname)
 
     def checkTimeoutDevices(self, timeout):
+        now = datetime.now()
+        delta = timedelta(minutes=int(timeout))
         for idx in Devices:
-            now = datetime.now()
-            last = datetime.fromtimestamp(time.mktime(time.strptime(Devices[idx].LastUpdate, "%Y-%m-%d %H:%M:%S")))
-            delta = timedelta(minutes=int(timeout))
-            if now - last > delta:
-                if Devices[idx].Type != 244:
-                    Devices[idx].Update(nValue = Devices[idx].nValue, sValue = Devices[idx].sValue, TimedOut=1)
+            if Devices[idx].TimedOut == 0:
+                last = datetime.fromtimestamp(time.mktime(time.strptime(Devices[idx].LastUpdate, "%Y-%m-%d %H:%M:%S")))
+                if now - last > delta:
+                    if Devices[idx].Type != 244:
+                        Debug("Timeout for {}".format(Devices[idx].Name))
+                        Devices[idx].Update(nValue = Devices[idx].nValue, sValue = Devices[idx].sValue, TimedOut=1, SuppressTriggers=True)
 
 ###########################
 # Tasmota Utility functions
