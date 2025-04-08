@@ -16,6 +16,11 @@ except Exception as e:
 #    import binascii
 #except Exception as e:
 #    errmsg += " binascii import error: "+str(e)
+try:
+    import time
+    from datetime import datetime, timedelta
+except Exception as e:
+    errmsg += " datetime import error: "+str(e)
 
 
 tasmotaDebug = True
@@ -125,6 +130,15 @@ class Handler:
                 if 'Illuminance' in message['ZbReceived'][key]:
                     updateLightsensor(device, message['ZbReceived'][key]['Illuminance'], friendlyname)
 
+    def checkTimeoutDevices(self, timeout):
+        for idx in Devices:
+            now = datetime.now()
+            last = datetime.fromtimestamp(time.mktime(time.strptime(Devices[idx].LastUpdate, "%Y-%m-%d %H:%M:%S")))
+            delta = timedelta(minutes=int(timeout))
+            if now - last > delta:
+                if Devices[idx].Type != 244:
+                    Devices[idx].Update(nValue = Devices[idx].nValue, sValue = Devices[idx].sValue, TimedOut=1)
+
 ###########################
 # Tasmota Utility functions
 
@@ -134,18 +148,17 @@ def updateTemp(shortaddr,temperature,friendlyname):
     for idx in Devices:
         if Devices[idx].DeviceID == shortaddr:
            if Devices[idx].Type == 80: #Temperature
-              Devices[idx].Update(nValue=0, sValue="{:.1f}".format(temperature))
+              Devices[idx].Update(nValue=0, sValue="{:.1f}".format(temperature), TimedOut=0)
               Domoticz.Log("Update Device {} Temperature {}".format(Devices[idx].Name,temperature))
            elif Devices[idx].Type == 81: #Humidity
-              Devices[idx].Update(TypeName="Temp+Hum",nValue=0, sValue="{:.1f};{};{}".format(temperature,Devices[idx].nValue,Devices[idx].sValue))
+              Devices[idx].Update(TypeName="Temp+Hum",nValue=0, sValue="{:.1f};{};{}".format(temperature,Devices[idx].nValue,Devices[idx].sValue), TimedOut=0)
               Domoticz.Log("Update Device {} to Temp+Hum Temperature {}".format(Devices[idx].Name,temperature))
            elif Devices[idx].Type == 82: #Temp+Hum
               svalue=Devices[idx].sValue
               parts=svalue.split(';')
               parts[0]="{:.1f}".format(temperature)
               svalue=";".join(parts)
-              Devices[idx].Update(nValue=0, sValue=svalue)
-#              Debug(svalue)
+              Devices[idx].Update(nValue=0, sValue=svalue, TimedOut=0)
               Domoticz.Log("Update Device {} Temperature {}".format(Devices[idx].Name,temperature))
            create=False
     if create:
@@ -163,10 +176,10 @@ def updateHumidity(shortaddr, humidity,friendlyname):
     for idx in Devices:
         if Devices[idx].DeviceID == shortaddr:
            if Devices[idx].Type == 81: #Humidity
-              Devices[idx].Update(nValue=int(round(humidity)), sValue=humstat)
+              Devices[idx].Update(nValue=int(round(humidity)), sValue=humstat, TimedOut=0)
               Domoticz.Log("Update Device {} Humidity {}".format(Devices[idx].Name,humidity))
            elif Devices[idx].Type == 80: #Temperature
-              Devices[idx].Update(TypeName="Temp+Hum",nValue=0, sValue="{};{};{}".format(Devices[idx].sValue,int(round(humidity)),humstat))
+              Devices[idx].Update(TypeName="Temp+Hum",nValue=0, sValue="{};{};{}".format(Devices[idx].sValue,int(round(humidity)),humstat), TimedOut=0)
               Domoticz.Log("Update Device {} to Temp+Hum Humidity {}".format(Devices[idx].Name,humidity))
            elif Devices[idx].Type == 82: #Temp+Hum
               svalue=Devices[idx].sValue
@@ -174,8 +187,7 @@ def updateHumidity(shortaddr, humidity,friendlyname):
               parts[1]=str(int(round(humidity)))
               parts[2]=humstat
               svalue=";".join(parts)
-              Debug(svalue)
-              Devices[idx].Update(nValue=0, sValue=svalue)
+              Devices[idx].Update(nValue=0, sValue=svalue, TimedOut=0)
               Domoticz.Log("Update Device {} Humidity {}".format(Devices[idx].Name,humidity))
            create=False
     if create:
@@ -187,7 +199,7 @@ def updateLightsensor(shortaddr, illuminance, friendlyname):
     for idx in Devices:
         if Devices[idx].DeviceID == shortaddr:
            if Devices[idx].Type == 246: # Lux
-              Devices[idx].Update(nValue=0,sValue=str(lux))
+              Devices[idx].Update(nValue=0,sValue=str(lux), TimedOut=0)
               Domoticz.Log("Update Device {} Lux {}".format(Devices[idx].Name,lux))
            create=False
     if create:
