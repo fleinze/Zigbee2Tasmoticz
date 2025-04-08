@@ -144,7 +144,8 @@ def updateTemp(shortaddr,temperature,friendlyname):
               parts=svalue.split(';')
               parts[0]="{:.1f}".format(temperature)
               svalue=";".join(parts)
-              Devices[idx].Update(TypeName="Temp+Hum",nValue=0, sValue=svalue)
+              Devices[idx].Update(nValue=0, sValue=svalue)
+#              Debug(svalue)
               Domoticz.Log("Update Device {} Temperature {}".format(Devices[idx].Name,temperature))
            create=False
     if create:
@@ -173,7 +174,8 @@ def updateHumidity(shortaddr, humidity,friendlyname):
               parts[1]=str(int(round(humidity)))
               parts[2]=humstat
               svalue=";".join(parts)
-              Devices[idx].Update(TypeName="Temp+Hum",nValue=0, sValue=svalue)
+              Debug(svalue)
+              Devices[idx].Update(nValue=0, sValue=svalue)
               Domoticz.Log("Update Device {} Humidity {}".format(Devices[idx].Name,humidity))
            create=False
     if create:
