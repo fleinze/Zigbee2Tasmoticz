@@ -200,7 +200,7 @@ def updateLightsensor(shortaddr, illuminance, friendlyname):
 def updateBatteryPercentage(shortaddr, battery_percentage):
     for idx in Devices:
         if Devices[idx].DeviceID == shortaddr:
-           Devices[idx].Update(nValue=Devices[idx].nValue, sValue=Devices[idx].sValue, BatteryLevel=int(battery_percentage))
+           Devices[idx].Update(nValue=Devices[idx].nValue, sValue=Devices[idx].sValue, BatteryLevel=int(battery_percentage), SuppressTriggers=True)
            Debug("Update Device {} Battery Percentage: {}".format(Devices[idx].Name, battery_percentage))
 
 def updateBatteryVoltage(shortaddr, battery_voltage): #do nothing
@@ -209,7 +209,7 @@ def updateBatteryVoltage(shortaddr, battery_voltage): #do nothing
 def updateLinkQuality(shortaddr, link_quality):
     for idx in Devices:
         if Devices[idx].DeviceID == shortaddr:
-           Devices[idx].Update(nValue=Devices[idx].nValue, sValue=Devices[idx].sValue, SignalLevel=int(min(round(link_quality/254*12),12)))
+           Devices[idx].Update(nValue=Devices[idx].nValue, sValue=Devices[idx].sValue, SignalLevel=int(min(round(link_quality/254*12),12)), SuppressTriggers=True)
            Debug("Device: {}, Link Quality: {}".format(Devices[idx].Name, link_quality))
 
 def updateSwitch(shortaddr, power, friendlyname):
