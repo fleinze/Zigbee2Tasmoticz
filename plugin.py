@@ -36,7 +36,7 @@
 
 errmsg = ""
 try:
-    import Domoticz
+    import DomoticzEx as Domoticz
 except Exception as e:
     errmsg += "Domoticz core start error: "+str(e)
 try:
@@ -105,10 +105,11 @@ class Plugin:
 
     # Let tasmotaHandler react to commands from Domoticz
 
-    def onCommand(self, Unit, Command, Level, Color):
+    def onCommand(self, DeviceID, Unit, Command, Level, Color):
+#        domoticz.debug("[Command] Device " + DeviceID + '(' + str(Unit) + '): ' + Command + "(level = " + str(Level) + ", color = " + Color + ')')
         if self.mqttClient is None:
             return False
-        return self.tasmotaHandler.onDomoticzCommand(Unit, Command, Level, Color)
+        return self.tasmotaHandler.onDomoticzCommand(DeviceID, Unit, Command, Level, Color)
 
     def onConnect(self, Connection, Status, Description):
         Debug("Plugin::onConnect")
@@ -135,7 +136,7 @@ class Plugin:
                     self.mqttClient.ping()
             except Exception as e:
                 Domoticz.Error("Plugin::onHeartbeat error {}".format(str(e)))
-        self.tasmotaHandler.checkTimeoutDevices(Settings['SensorTimeout'])
+#        self.tasmotaHandler.checkTimeoutDevices(Settings['SensorTimeout'])
 
 
     # Let tasmotaHandler subscribe its topics
@@ -182,9 +183,9 @@ def onMessage(Connection, Data):
     _plugin.onMessage(Connection, Data)
 
 
-def onCommand(Unit, Command, Level, Color):
+def onCommand(Unit, DeviceID, Command, Level, Color):
     global _plugin
-    _plugin.onCommand(Unit, Command, Level, Color)
+    _plugin.onCommand(Unit, DeviceID, Command, Level, Color)
 
 
 def onHeartbeat():
