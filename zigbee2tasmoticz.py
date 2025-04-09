@@ -141,25 +141,17 @@ class Handler:
 
 
 def updateTemp(shortaddr, endpoint, temperature, friendlyname):
-#    Debug("updateTemp")
     create=True
     if shortaddr in Devices and endpoint in Devices[shortaddr].Units:
-#    for idx in Devices:
-#        if Devices[idx].DeviceID == shortaddr:
         if Devices[shortaddr].Units[endpoint].Type == 80: #Temperature
             Devices[shortaddr].Units[endpoint].nValue = 0
             Devices[shortaddr].Units[endpoint].sValue = "{:.1f}".format(temperature)
             Devices[shortaddr].Units[endpoint].Update(Log=True)
-#         Devices[idx].Update(nValue=0, sValue="{:.1f}".format(temperature), TimedOut=0)
-#              Domoticz.Log("Update Device {} Temperature {}".format(Devices[idx].Name,temperature))
         elif Devices[shortaddr].Units[endpoint].Type == 81: #Humidity
-#            Devices[shortaddr].Units[endpoint].TypeName = "Temp+Hum"
             Devices[shortaddr].Units[endpoint].Update(TypeName = "Temp+Hum", SuppressTriggers=True)
-            Devices[shortaddr].Units[endpoint].nValue = 0
             Devices[shortaddr].Units[endpoint].sValue = "{:.1f};{};{}".format(temperature, Devices[shortaddr].Units[endpoint].nValue, Devices[shortaddr].Units[endpoint].sValue)
+            Devices[shortaddr].Units[endpoint].nValue = 0
             Devices[shortaddr].Units[endpoint].Update(Log=True)
-#              Devices[idx].Update(TypeName="Temp+Hum",nValue=0, sValue="{:.1f};{};{}".format(temperature,Devices[idx].nValue,Devices[idx].sValue), TimedOut=0)
-#              Domoticz.Log("Update Device {} to Temp+Hum Temperature {}".format(Devices[idx].Name,temperature))
         elif Devices[shortaddr].Units[endpoint].Type == 82: #Temp+Hum
             svalue = Devices[shortaddr].Units[endpoint].sValue
             parts=svalue.split(';')
@@ -168,15 +160,12 @@ def updateTemp(shortaddr, endpoint, temperature, friendlyname):
             Devices[shortaddr].Units[endpoint].nValue = 0
             Devices[shortaddr].Units[endpoint].sValue = svalue
             Devices[shortaddr].Units[endpoint].Update(Log=True)
-#        Devices[idx].Update(nValue=0, sValue=svalue, TimedOut=0)
-#              Domoticz.Log("Update Device {} Temperature {}".format(Devices[idx].Name,temperature))
         create=False
     if create:
         createDevice(deviceid=shortaddr, unit=endpoint, devicetype="Temperature",name=friendlyname,nvalue=0,svalue="{:.1f}".format(temperature))
 
 
 def updateHumidity(shortaddr, endpoint, humidity, friendlyname):
-#    Debug("updateHumidity")
     create=True
     if humidity<40:
         humstat="2"
@@ -184,23 +173,16 @@ def updateHumidity(shortaddr, endpoint, humidity, friendlyname):
         humstat="3"
     else:
         humstat="1"
-#    for idx in Devices:
-#        if Devices[idx].DeviceID == shortaddr:
     if shortaddr in Devices and endpoint in Devices[shortaddr].Units:
         if Devices[shortaddr].Units[endpoint].Type == 81: #Humidity
             Devices[shortaddr].Units[endpoint].nValue = int(round(humidity))
             Devices[shortaddr].Units[endpoint].sValue = humstat
             Devices[shortaddr].Units[endpoint].Update(Log=True)
-#              Devices[idx].Update(nValue=int(round(humidity)), sValue=humstat, TimedOut=0)
-#              Domoticz.Log("Update Device {} Humidity {}".format(Devices[idx].Name,humidity))
         elif Devices[shortaddr].Units[endpoint].Type == 80: #Temperature
-#            Devices[shortaddr].Units[endpoint].TypeName = "Temp+Hum"
             Devices[shortaddr].Units[endpoint].Update(TypeName = "Temp+Hum", SuppressTriggers=True)
             Devices[shortaddr].Units[endpoint].nValue = 0
             Devices[shortaddr].Units[endpoint].sValue = "{};{};{}".format(Devices[shortaddr].Units[endpoint].sValue, int(round(humidity)), humstat)
             Devices[shortaddr].Units[endpoint].Update(Log=True)
-#              Devices[idx].Update(TypeName="Temp+Hum",nValue=0, sValue="{};{};{}".format(Devices[idx].sValue,int(round(humidity)),humstat), TimedOut=0)
-#              Domoticz.Log("Update Device {} to Temp+Hum Humidity {}".format(Devices[idx].Name,humidity))
         elif Devices[shortaddr].Units[endpoint].Type == 82: #Temp+Hum
             svalue=Devices[shortaddr].Units[endpoint].sValue
             parts=svalue.split(';')
@@ -210,8 +192,6 @@ def updateHumidity(shortaddr, endpoint, humidity, friendlyname):
             Devices[shortaddr].Units[endpoint].nValue = 0
             Devices[shortaddr].Units[endpoint].sValue = svalue
             Devices[shortaddr].Units[endpoint].Update(Log=True)
-#              Devices[idx].Update(nValue=0, sValue=svalue, TimedOut=0)
-#              Domoticz.Log("Update Device {} Humidity {}".format(Devices[idx].Name,humidity))
         create=False
     if create:
         createDevice(deviceid=shortaddr, unit=endpoint, devicetype="Humidity",name=friendlyname,nvalue=int(round(humidity)),svalue=humstat)
@@ -219,15 +199,11 @@ def updateHumidity(shortaddr, endpoint, humidity, friendlyname):
 def updateLightsensor(shortaddr, endpoint, illuminance, friendlyname):
     create = True
     lux = round(10**(illuminance/10000)-1) # according to zigbee documentation
-#    for idx in Devices:
-#        if Devices[idx].DeviceID == shortaddr:
     if shortaddr in Devices and endpoint in Devices[shortaddr].Units:
         if Devices[shortaddr].Units[endpoint].Type == 246: # Lux
             Devices[shortaddr].Units[endpoint].nValue = 0
             Devices[shortaddr].Units[endpoint].sValue = str(lux)
             Devices[shortaddr].Units[endpoint].Update(Log=True)
-#              Devices[idx].Update(nValue=0,sValue=str(lux), TimedOut=0)
-#              Domoticz.Log("Update Device {} Lux {}".format(Devices[idx].Name,lux))
         create=False
     if create:
         createDevice(deviceid=shortaddr, unit=endpoint, devicetype="Illumination",name=friendlyname,nvalue=0,svalue=str(lux))
@@ -244,71 +220,36 @@ def updateLinkQuality(shortaddr, endpoint, link_quality):
     if shortaddr in Devices and endpoint in Devices[shortaddr].Units:
         Devices[shortaddr].Units[endpoint].SignalLevel=int(min(round(link_quality/254*12),12))
         Devices[shortaddr].Units[endpoint].Update(Log=True, SuppressTriggers=True)
-#    for idx in Devices
-#        if Devices[idx].DeviceID == shortaddr:
-#           Devices[idx].Update(nValue=Devices[idx].nValue, sValue=Devices[idx].sValue, SignalLevel=int(min(round(link_quality/254*12),12)), SuppressTriggers=True)
-#           Debug("Device: {}, Link Quality: {}".format(Devices[idx].Name, link_quality))
 
 def updateSwitch(shortaddr, endpoint, power, friendlyname):
-#    Debug("Device: {}, Power: {}".format(shortaddr, power))
     create=True
-#    for idx in Devices:
-#        if Devices[idx].DeviceID == shortaddr:
     if shortaddr in Devices and endpoint in Devices[shortaddr].Units:
         if  Devices[shortaddr].Units[endpoint].Type == 244:
             if  Devices[shortaddr].Units[endpoint].SwitchType == 7:
                 Devices[shortaddr].Units[endpoint].nValue = power
                 Devices[shortaddr].Units[endpoint].Update(Log=True)
-#            Devices[idx].Update(nValue=power,sValue= Devices[idx].sValue)
             else:
                 Devices[shortaddr].Units[endpoint].nValue = power
                 Devices[shortaddr].Units[endpoint].sValue = "On" if power == 1 else "Off"
                 Devices[shortaddr].Units[endpoint].Update(Log=True)
-#            Devices[idx].Update(nValue=power,sValue="On" if power == 1 else "Off")
-#               Domoticz.Log("Update switch {} nvalue {} svalue {}".format(friendlyname,power,"On" if power == 1 else "Off"))
         create=False
     if create:
         createDevice(deviceid=shortaddr, unit=endpoint, devicetype="Switch",name=friendlyname,nvalue=power,svalue="")
 
 def updateDimmer(shortaddr, endpoint, dimmer, friendlyname): #dimmers are not created but only updated from existing switches
     Debug("Device: {}, Dimmer: {}".format(shortaddr, dimmer))
-#    for idx in Devices:
-#        if Devices[idx].DeviceID == shortaddr:
-#           Debug("SwitchType {}".format(Devices[idx].SwitchType))
-#    Debug(Devices[shortaddr].Units[endpoint].Type)
     if shortaddr in Devices and endpoint in Devices[shortaddr].Units:
         if Devices[shortaddr].Units[endpoint].Type == 244:
-#            Debug(Devices[shortaddr].Units[endpoint].SwitchType)
             if Devices[shortaddr].Units[endpoint].SwitchType != 7:
-#                Devices[shortaddr].Units[endpoint].SubType = 73
-#                Devices[shortaddr].Units[endpoint].SwitchType = 7
                 Devices[shortaddr].Units[endpoint].Update(TypeName="Dimmer", SuppressTriggers=True)
             Devices[shortaddr].Units[endpoint].sValue = str(int(round(dimmer/2.55)))
             Devices[shortaddr].Units[endpoint].Update(Log=True)
-#            Devices[idx].Update(Subtype=73,Switchtype=7,sValue=str(int(round(dimmer/2.55))),nValue=Devices[idx].nValue)
-#        Devices[idx].Update(sValue=str(int(round(dimmer/2.55))),nValue=Devices[idx].nValue)
-#               Devices[idx].Update(nValue=power,sValue="On" if power == 1 else "Off")
-#               Domoticz.Log("Update dimmer {}  {}".format(friendlyname,dimmer))
 
 
 def createDevice(deviceid, unit, devicetype, name, nvalue, svalue):
     Domoticz.Log("Create Device: {} {}".format(name, devicetype))
-#    unit = findfreeUnit()
     Domoticz.Unit(Name=name, DeviceID=deviceid, Unit=unit, TypeName=devicetype, Used=1).Create()
     Devices[deviceid].Units[unit].nValue = nvalue
     Devices[deviceid].Units[unit].sValue = svalue
     Devices[deviceid].Units[unit].Update(Log=True)
-#    Domoticz.Device(Name=name, Unit=unit, TypeName=devicetype, Used=1, DeviceID=deviceid).Create()
-#    if unit in Devices:
-#        Devices[unit].Update(nValue=Devices[unit].nValue, sValue=Devices[unit].sValue, Name=name, SuppressTriggers=True)
-#        Devices[unit].Update(nValue=nvalue, sValue=svalue)
-#    for idx in Devices:
-#        if Devices[idx].DeviceID == deviceid:
-#           Devices[idx].Update(nValue=nvalue, sValue=svalue)
-
-#def findfreeUnit():
-#    for idx in range(1, 512):
-#        if idx not in Devices:
-#            break
-#    return idx
 
