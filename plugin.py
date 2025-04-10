@@ -2,9 +2,9 @@
 <plugin 
     key="Zigbee2Tasmoticz" 
     name="Autodiscovery of Zigbee2Tasmota Devices"
-    version="0.1"
+    version="1.0"
     author="Fleinze" 
-    externallink="https://github.com/fleinze/">
+    externallink="https://github.com/fleinze/Zigbee2Tasmoticz">
    
     <description>
         Plugin to discover and operate Zigbee2Tasmota devices through MQTT
