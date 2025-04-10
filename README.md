@@ -1,5 +1,11 @@
 # Zigbee2Tasmoticz
 
+## Important
+
+This branch is based on the legacy Domoticz Python framework and no longer under active developement.
+
+## Introduction
+
 Zigbee2Tasmoticz is a Domoticz plugin designed to integrate Zigbee devices managed by [Zigbee2Tasmota](https://tasmota.github.io/docs/Zigbee/) into the Domoticz home automation system. This plugin is a fork of the original [Tasmoticz](https://github.com/foba-1/Tasmoticz) plugin, tailored specifically for Zigbee2Tasmota integration.
 
 ## Features
