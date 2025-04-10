@@ -128,11 +128,12 @@ class Handler:
         delta = timedelta(minutes=int(timeout))
         for device in Devices:
             if Devices[device].TimedOut == 0:
-                last = datetime.fromtimestamp(time.mktime(time.strptime(Devices[device].Units[1].LastUpdate, "%Y-%m-%d %H:%M:%S")))
-                if now - last > delta:
-                    if Devices[device].Units[1].Type != 244:
-                        Debug("Timeout for {}".format(Devices[device].Units[1].Name))
-                        Devices[device].TimedOut = 1
+                if 1 in Devices[device].Units:
+                    last = datetime.fromtimestamp(time.mktime(time.strptime(Devices[device].Units[1].LastUpdate, "%Y-%m-%d %H:%M:%S")))
+                    if now - last > delta:
+                        if Devices[device].Units[1].Type != 244:
+                            Debug("Timeout for {}".format(Devices[device].Units[1].Name))
+                            Devices[device].TimedOut = 1
 
 ###########################
 # Tasmota Utility functions
@@ -234,7 +235,7 @@ def updateLinkQuality(shortaddr, endpoint, link_quality, friendlyname):
     if shortaddr in Devices and endpoint in Devices[shortaddr].Units:
         Devices[shortaddr].Units[endpoint].SignalLevel=int(min(round(link_quality/254*12),12))
         Devices[shortaddr].Units[endpoint].Update(UpdateProperties=True)
-        Domoticz.Log("Update {} {} LQI {}".format(friendlyname,endpoint,link_quality))
+        Debug("Update {} {} LQI {}".format(friendlyname,endpoint,link_quality))
 
 def updateSwitch(shortaddr, endpoint, power, friendlyname):
     create=True
