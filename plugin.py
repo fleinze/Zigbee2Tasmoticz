@@ -136,7 +136,7 @@ class Plugin:
                     self.mqttClient.ping()
             except Exception as e:
                 Domoticz.Error("Plugin::onHeartbeat error {}".format(str(e)))
-#        self.tasmotaHandler.checkTimeoutDevices(Settings['SensorTimeout'])
+        self.tasmotaHandler.checkTimeoutDevices(Settings['SensorTimeout'])
 
 
     # Let tasmotaHandler subscribe its topics
