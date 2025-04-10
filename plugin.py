@@ -79,7 +79,7 @@ class Plugin:
                 pluginDebug = False
                 setTasmotaDebug(True)
                 setMqttDebug(False)
-                
+
                 Debug("Plugin::onStart: Parameters: {}".format(repr(Parameters)))
                 self.mqttserveraddress = Parameters["Address"].strip()
                 self.mqttserverport = Parameters["Port"].strip()
@@ -135,6 +135,8 @@ class Plugin:
                     self.mqttClient.ping()
             except Exception as e:
                 Domoticz.Error("Plugin::onHeartbeat error {}".format(str(e)))
+        self.tasmotaHandler.checkTimeoutDevices(Settings['SensorTimeout'])
+
 
     # Let tasmotaHandler subscribe its topics
 
