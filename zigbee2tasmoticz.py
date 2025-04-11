@@ -122,6 +122,8 @@ class Handler:
                     updateSwitch(device, unit, message['ZbReceived'][key]['Occupancy'], friendlyname)
                 if 'Illuminance' in message['ZbReceived'][key]:
                     updateLightsensor(device, unit, message['ZbReceived'][key]['Illuminance'], friendlyname)
+                if 'Custom' in message['ZbReceived'][key]: # add custom value in .zb file in gateway
+                   updateCustom(device, unit, message['ZbReceived'][key]['Custom'], friendlyname)
 
     def checkTimeoutDevices(self, timeout):
         now = datetime.now()
@@ -221,6 +223,19 @@ def updateLightsensor(shortaddr, endpoint, illuminance, friendlyname):
         create=False
     if create:
         createDevice(deviceid=shortaddr, unit=endpoint, devicetype="Illumination",name=friendlyname,nvalue=0,svalue=str(lux))
+
+def updateCustom(shortaddr, endpoint, custom, friendlyname):
+    create = True
+    if shortaddr in Devices and endpoint in Devices[shortaddr].Units:
+        if Devices[shortaddr].TimedOut == 1:
+            Devices[shortaddr].TimedOut = 0
+        Devices[shortaddr].Units[endpoint].nValue = 0
+        Devices[shortaddr].Units[endpoint].sValue = str(custom)
+        Devices[shortaddr].Units[endpoint].Update(Log=True)
+        Domoticz.Log("Update {} {} Lux {}".format(friendlyname,endpoint,str(custom)))
+        create=False
+    if create:
+        createDevice(deviceid=shortaddr, unit=endpoint, devicetype="Custom",name=friendlyname,nvalue=0,svalue=str(custom))
 
 def updateBatteryPercentage(shortaddr, endpoint, battery_percentage, friendlyname):
     if shortaddr in Devices and endpoint in Devices[shortaddr].Units:
