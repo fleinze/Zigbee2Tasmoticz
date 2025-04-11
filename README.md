@@ -2,7 +2,7 @@
 
 ## Important
 
-This is the new default branch. It is now based on the extended Domoticz Python framework (DomoticzEx). If you change from an legacy branch you need to recreate all devices.
+This is the new default branch. It is now based on the extended Domoticz Python framework (DomoticzEx). If you change from the legacy branch you need to recreate all devices.
 
 ## Introduction
 
