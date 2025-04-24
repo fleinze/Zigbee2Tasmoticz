@@ -20,6 +20,8 @@ except Exception as e:
 
 tasmotaDebug = True
 
+# Key: (device_id, endpoint), Value: off_timestamp
+timed_off_devices = {}
 
 # Decide if tasmota.py debug messages should be displayed if domoticz debug is enabled for this plugin
 def setTasmotaDebug(flag):
@@ -111,7 +113,9 @@ class Handler:
                     updateBatteryVoltage(device, unit, message['ZbReceived'][key]['BatteryVoltage'], friendlyname)
                 if 'LinkQuality' in message['ZbReceived'][key]:
                     updateLinkQuality(device, unit, message['ZbReceived'][key]['LinkQuality'], friendlyname)
-                if 'Power' in message['ZbReceived'][key]:
+                if '0006!42' in message['ZbReceived'][key]: # power on with timed off command
+                    timedSwitch(device, unit, message['ZbReceived'][key]['PowerOnTime'], message['ZbReceived'][key]['PowerOffWait'], message['ZbReceived'][key]['PowerOnlyWhenOn'], friendlyname)
+                elif 'Power' in message['ZbReceived'][key]:
                     updateSwitch(device, unit, message['ZbReceived'][key]['Power'], friendlyname)
                 if 'Dimmer' in message['ZbReceived'][key]:
                     updateDimmer(device, unit, message['ZbReceived'][key]['Dimmer'], friendlyname)
@@ -126,15 +130,24 @@ class Handler:
 
     def checkTimeoutDevices(self, timeout):
         now = time.time()
+        to_remove = []
         delta = int(timeout)*60
         for device in Devices:
             if Devices[device].TimedOut == 0:
                 if 1 in Devices[device].Units:
-                    last = time.mktime(time.strptime(Devices[device].Units[1].LastUpdate, "%Y-%m-%d %H:%M:%S"))
+                    last = time.mktime(time.strptime(Devices[device].Units[sorted(Devices[device].Units.keys())[0]].LastUpdate, "%Y-%m-%d %H:%M:%S"))
                     if now - last > delta:
-                        if Devices[device].Units[1].Type != 244:
-                            Debug("Timeout for {}".format(Devices[device].Units[1].Name))
+                        if Devices[device].Units[sorted(Devices[device].Units.keys())[0]].Type != 244:
+                            Debug("Timeout for {}".format(Devices[device].Units[sorted(Devices[device].Units.keys())[0]].Name))
                             Devices[device].TimedOut = 1
+        for (shortaddr, endpoint), off_time in timed_off_devices.items():
+            if now >= off_time:
+                Domoticz.Log(f"Timed off {shortaddr} {endpoint}")
+                updateSwitch(shortaddr, endpoint, 0, "")
+                to_remove.append((shortaddr, endpoint))
+        for key in to_remove:
+            del timed_off_devices[key]
+
 
 ###########################
 # Tasmota Utility functions
@@ -250,6 +263,16 @@ def updateLinkQuality(shortaddr, endpoint, link_quality, friendlyname):
         Devices[shortaddr].Units[endpoint].SignalLevel=int(min(round(link_quality/254*12),12))
         Devices[shortaddr].Units[endpoint].Update(UpdateProperties=True)
         Debug("Update {} {} LQI {}".format(friendlyname,endpoint,link_quality))
+
+def timedSwitch(shortaddr, endpoint, powerontime, poweroffwait, poweronlywhenon, friendlyname):
+    # Not implemented: PowerOffWait
+    #Debug("Device: {}, Unit {}, PowerOnTime {}, PowerOffWait {}, PowerOnlyWhenOn {}".format(friendlyname, endpoint, powerontime, poweroffwait, poweronlywhenon))
+    if poweronlywhenon == 0:
+        offtime = time.time() + powerontime
+        updateSwitch(shortaddr, endpoint, 1, friendlyname)
+        Domoticz.Log("Update {} {} Power on for {}s".format(friendlyname,endpoint,powerontime))
+        timed_off_devices[(shortaddr, endpoint)] = offtime
+
 
 def updateSwitch(shortaddr, endpoint, power, friendlyname):
     create=True
