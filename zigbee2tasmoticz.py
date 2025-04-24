@@ -14,9 +14,8 @@ except Exception as e:
 #    errmsg += " Json import error: "+str(e)
 try:
     import time
-    from datetime import datetime, timedelta
 except Exception as e:
-    errmsg += " datetime import error: "+str(e)
+    errmsg += " time import error: "+str(e)
 
 
 tasmotaDebug = True
@@ -126,12 +125,12 @@ class Handler:
                    updateCustom(device, unit, message['ZbReceived'][key]['Custom'], friendlyname)
 
     def checkTimeoutDevices(self, timeout):
-        now = datetime.now()
-        delta = timedelta(minutes=int(timeout))
+        now = time.time()
+        delta = int(timeout)*60
         for device in Devices:
             if Devices[device].TimedOut == 0:
                 if 1 in Devices[device].Units:
-                    last = datetime.fromtimestamp(time.mktime(time.strptime(Devices[device].Units[1].LastUpdate, "%Y-%m-%d %H:%M:%S")))
+                    last = time.mktime(time.strptime(Devices[device].Units[1].LastUpdate, "%Y-%m-%d %H:%M:%S"))
                     if now - last > delta:
                         if Devices[device].Units[1].Type != 244:
                             Debug("Timeout for {}".format(Devices[device].Units[1].Name))
