@@ -134,7 +134,7 @@ class Handler:
         delta = int(timeout)*60
         for device in Devices:
             if Devices[device].TimedOut == 0:
-                if 1 in Devices[device].Units:
+                if len(Devices[device].Units) > 0:
                     last = time.mktime(time.strptime(Devices[device].Units[sorted(Devices[device].Units.keys())[0]].LastUpdate, "%Y-%m-%d %H:%M:%S"))
                     if now - last > delta:
                         if Devices[device].Units[sorted(Devices[device].Units.keys())[0]].Type != 244:
